@@ -139,8 +139,7 @@ bitset<32> f(bitset<32> R, bitset<48> k)
 	bitset<32> tmp = output;
 	for(int i=0; i<32; ++i)
 		output[31-i] = tmp[32-P[i]];
-		cout<<"Functie f"<<g<<"(R,K) "<<output.to_string<char,std::string::traits_type,std::string::allocator_type>()<< endl;
-                g++;
+
 	return output;
 }
 
@@ -182,10 +181,7 @@ void generareCheieRunda()
 			compressKey[47-i] = realKey[56 - PC_2[i]];
 		subKey[round] = compressKey;
 	}
-	cout<<"Generated keys : " <<endl;
-	for(int i=0;i<16;++i)
-        cout<<"Key # "<<i+1<<" = "<<subKey[i]<<endl;
-        cout<<endl;
+
 }
 
 bitset<64> charToBitset(const char s[8])
@@ -255,35 +251,35 @@ bitset<64> decrypt(bitset<64>& cipher)
 }
 
 
-int main() {
-    string s = "MNMNMNMN";
-	string k = "12345687";
-	bitset<64> plain = charToBitset(s.c_str());
-	cout<<"Plain text : "<<plain.to_string<char,std::string::traits_type,std::string::allocator_type>()<< endl;
-	key = charToBitset(k.c_str());
-	cout<<"The key : "<<key.to_string<char,std::string::traits_type,std::string::allocator_type>()<< endl;
-	generareCheieRunda();
-	bitset<64> cipher = encrypt(plain);
-	cout<<endl;
-	cout<<"Encrypted text : "<<cipher.to_string<char,std::string::traits_type,std::string::allocator_type>();
-	fstream file1;
-	file1.open("cripted.txt", ios::binary | ios::out);
-	file1.write((char*)&cipher,sizeof(cipher));
-	file1.close();
-	cout<<endl;
-    cout<<"Decrypt process\n"<<  endl;
-	bitset<64> temp;
- 	file1.open("cripted.txt", ios::binary | ios::in);
-	file1.read((char*)&temp, sizeof(temp));
-	file1.close();
 
-	bitset<64> temp_plain = decrypt(temp);
-	file1.open("decripted.txt", ios::binary | ios::out);
-	file1.write((char*)&temp_plain,sizeof(temp_plain));
-	file1.close();
-    cout<<"Decrypted text : "<<temp_plain.to_string<char,std::string::traits_type,std::string::allocator_type>()<<endl;
-    cout<<"Plaintext text : "<<plain.to_string<char,std::string::traits_type,std::string::allocator_type>();
+int main() {
+	string k = "1234567";
+	key = charToBitset(k.c_str());
+	generareCheieRunda();
+	ifstream in;
+	ofstream out;
+	in.open("1.jpg", ios::binary);
+	out.open("cipher.txt", ios::binary);
+	bitset<64> plain;
+	while(in.read((char*)&plain, sizeof(plain)))
+	{
+		bitset<64> cipher  = encrypt(plain);
+		out.write((char*)&cipher, sizeof(cipher));
+		plain.reset();
+	}
+	in.close();
+	out.close();
+
+	in.open("cipher.txt", ios::binary);
+	out.open("2.jpg", ios::binary);
+	while(in.read((char*)&plain, sizeof(plain)))
+	{
+		bitset<64> temp  = decrypt(plain);
+		out.write((char*)&temp, sizeof(temp));
+		plain.reset();
+	}
+	in.close();
+	out.close();
 
 	return 0;
 }
-
